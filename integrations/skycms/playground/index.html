@@ -10,11 +10,19 @@
             padding: 0;
             box-sizing: border-box;
         }
+
+        html,
+        body {
+            height: 100%;
+        }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #1e1e1e;
             color: #d4d4d4;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         
         header {
@@ -24,26 +32,161 @@
         }
         
         h1 {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             margin: 0;
         }
         
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #2d2d30;
+            border-bottom: 1px solid #3e3e42;
+        }
+
+        .tab {
+            border: 1px solid #45454a;
+            background: #252526;
+            color: #d4d4d4;
+            border-radius: 6px;
+            padding: 0.35rem 0.7rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .tab.active {
+            background: #0e639c;
+            border-color: #1177bb;
+            color: #ffffff;
+        }
+
+        .dirty-dot {
+            color: #ffcc00;
+            font-weight: 700;
+            opacity: 0;
+            transition: opacity 120ms ease;
+        }
+
+        .dirty-dot.is-dirty {
+            opacity: 1;
+        }
+
+        .toolbar {
+            background: #252526;
+            border-bottom: 1px solid #3e3e42;
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-field {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #c8c8c8;
+            font-size: 0.9rem;
+        }
+
+        .toolbar-field.checkbox {
+            gap: 0.3rem;
+        }
+
+        .select {
+            background: #3a3d41;
+            color: #f2f2f2;
+            border: 1px solid #4e5257;
+            border-radius: 6px;
+            padding: 0.35rem 0.55rem;
+        }
+
+        .btn {
+            background: #3a3d41;
+            color: #f2f2f2;
+            border: 1px solid #4e5257;
+            border-radius: 6px;
+            padding: 0.35rem 0.7rem;
+            cursor: pointer;
+        }
+
+        .btn.is-active {
+            background: #0e639c;
+            border-color: #1177bb;
+        }
+
+        .vim-status {
+            padding: 0.35rem 1rem;
+            border-top: 1px solid #2f2f33;
+            background: #202024;
+            color: #d7d7d7;
+            font-size: 0.8rem;
+            min-height: 32px;
+            display: flex;
+            align-items: center;
+        }
+
+        .mock-log {
+            margin: 0;
+            padding: 0.5rem 1rem;
+            border-top: 1px solid #2f2f33;
+            background: #1b1b1f;
+            color: #b5b7ba;
+            font-size: 0.85rem;
+            max-height: 130px;
+            overflow: auto;
+            white-space: pre-wrap;
+        }
+
         #editor {
-            width: 100vw;
-            height: calc(100vh - 60px);
+            width: 100%;
+            flex: 1 1 auto;
+            min-height: 0;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>🎨 SkyCMS Monaco Editor Playground</h1>
+        <h1>SkyCMS Monaco Multi-Model Playground</h1>
     </header>
-    
+
+    <nav class="tabs" id="tabs"></nav>
+
+    <div class="toolbar">
+        <div id="status">Ready</div>
+        <div class="toolbar-actions">
+            <label class="toolbar-field" for="themeSelect">
+                <span>Theme</span>
+                <select id="themeSelect" class="select"></select>
+            </label>
+            <label class="toolbar-field checkbox" for="copilotToggle">
+                <input id="copilotToggle" type="checkbox" />
+                <span>Copilot Inline</span>
+            </label>
+            <label class="toolbar-field" for="copilotEndpointInput">
+                <span>Endpoint</span>
+                <input id="copilotEndpointInput" class="select" type="text" value="/api/copilot/complete" />
+            </label>
+            <button id="vimToggleBtn" class="btn" type="button">Enable Vim Mode</button>
+            <button id="saveBtn" class="btn" type="button">Save All (Mark Clean)</button>
+            <button id="mockApiSaveBtn" class="btn" type="button">Mock SkyCMS Save API</button>
+        </div>
+    </div>
+
+    <div id="vimStatus" class="vim-status">Vim mode disabled</div>
+    <pre id="mockApiLog" class="mock-log">Mock API log: none yet</pre>
+
     <div id="editor"></div>
-    
-    <script type="module">
-        // Import playground code here
-        console.log('SkyCMS Monaco Editor Playground loaded');
-    </script>
+
+    <script type="module" src="./main.ts"></script>
 </body>
 </html>

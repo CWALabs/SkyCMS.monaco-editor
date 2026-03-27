@@ -17,11 +17,13 @@ export default defineConfig({
         {
           format: 'es',
           entryFileNames: '[name].mjs',
+          exports: 'named',
         },
         {
           format: 'umd',
           name: 'SkyCMSMonacoEditor',
           entryFileNames: '[name].js',
+          exports: 'named',
           globals: {
             'monaco-editor': 'monaco',
           },

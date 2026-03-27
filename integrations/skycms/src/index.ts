@@ -1,48 +1,80 @@
 /**
  * SkyCMS Monaco Editor Integration
- * 
- * Export utilities and helpers for integrating Monaco Editor into SkyCMS
+ *
+ * Public library entrypoint. Keeps the deploy-facing API stable.
  */
 
-// Re-export core Monaco types
 export * from 'monaco-editor';
+export * from './core';
+export { enableEmmet } from './emmet';
+export { createGitHubCopilotInlineProvider } from './copilot';
+export { fetchCopilotProxyStatus, resolveCopilotStatusEndpoint } from './copilot';
+export { fetchCopilotProxyStatusWithRetry } from './copilot';
 
-// Placeholder for SkyCMS-specific integration
-export const version = '0.1.0';
+
+import {
+  createSkyCmsEditorWithMonaco,
+  version,
+  type SkyCmsEditorInstance,
+  type SkyCmsEditorOptions,
+} from './core';
+import {
+  configureMonacoAmdEnvironment,
+  mapSkyCmsEditorFields,
+  mapSkyCmsEditorModeToLanguage,
+  resolveActiveFieldId,
+} from './core';
+
+export async function createSkyCmsEditor(options: SkyCmsEditorOptions): Promise<SkyCmsEditorInstance> {
+  const monaco = await import('monaco-editor');
+  return createSkyCmsEditorWithMonaco(monaco, options);
+}
 
 /**
- * Initialize Monaco Editor for SkyCMS
- * @param {HTMLElement} container - Target container element
- * @param {Object} options - Editor options
- * @returns {Promise<any>} Monaco editor instance
+ * Backward-compatible single-model helper.
  */
-export async function initializeEditor(container, options = {}) {
+export async function initializeEditor(container: HTMLElement, options: import('monaco-editor').editor.IStandaloneEditorConstructionOptions = {}) {
   const { editor } = await import('monaco-editor');
   return editor.create(container, options);
 }
 
 /**
- * Create a code editor with SkyCMS defaults
- * @param {HTMLElement} container - Target container
- * @param {Object} config - Configuration
- * @returns {Promise<any>} Editor instance
+ * Backward-compatible single-field wrapper built on the multi-model API.
  */
-export async function createSkyCMSEditor(container, config = {}) {
-  const { editor } = await import('monaco-editor');
-  
-  const defaultOptions = {
-    theme: 'vs-dark',
-    language: 'html',
-    fontSize: 14,
-    minimap: { enabled: false },
-    ...config,
+export async function createSkyCMSEditor(container: HTMLElement, config: Record<string, unknown> = {}) {
+  const instance = await createSkyCmsEditor({
+    container,
+    fields: [
+      {
+        id: 'Content',
+        name: 'Content',
+        language: String(config.language || 'html'),
+        value: String(config.value || ''),
+      },
+    ],
+    activeFieldId: 'Content',
+    theme: String(config.theme || 'vs-dark'),
+    readOnly: !!config.readOnly,
+    automaticLayout: config.automaticLayout !== false,
+  });
+
+  return {
+    getValue: () => instance.getValue('Content'),
+    setValue: (value: string) => instance.setValue('Content', value),
+    focus: () => instance.focus(),
+    dispose: () => instance.dispose(),
+    __instance: instance,
   };
-  
-  return editor.create(container, defaultOptions);
 }
 
 export default {
   version,
   initializeEditor,
   createSkyCMSEditor,
+  createSkyCmsEditor,
+  createSkyCmsEditorWithMonaco,
+  mapSkyCmsEditorModeToLanguage,
+  mapSkyCmsEditorFields,
+  resolveActiveFieldId,
+  configureMonacoAmdEnvironment,
 };

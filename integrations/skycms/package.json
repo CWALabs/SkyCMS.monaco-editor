@@ -1,16 +1,21 @@
 {
   "name": "@skycms/monaco-editor-integration",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "SkyCMS Monaco Editor integration playground and deployment tooling.",
   "scripts": {
     "dev": "vite --config vite.config.mjs",
+    "mock:copilot": "node scripts/mock-copilot-server.mjs",
     "build": "vite build --config vite.config.mjs",
     "build:lib": "vite build --config vite.lib.config.mjs",
+    "build:assets": "node scripts/package-monaco-assets.mjs",
     "preview": "vite preview --config vite.config.mjs",
     "build:monaco": "cd ../../ && npm run build",
-    "build:all": "pnpm build:monaco && pnpm build:lib",
+    "build:all": "pnpm build:lib && pnpm build:assets && pnpm build",
+    "build:all:with-upstream": "pnpm build:monaco && pnpm build:all",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "deploy:skycms": "node scripts/deploy-skycms.mjs",
     "sync:status": "node scripts/upstream-sync-workflow.mjs status",
     "sync:upstream": "node scripts/upstream-sync-workflow.mjs sync-upstream",
@@ -22,9 +27,14 @@
     "sync:audit:status": "powershell -ExecutionPolicy Bypass -File scripts/upstream-sync-workflow.ps1 -Command status"
   },
   "dependencies": {
-    "monaco-editor": "workspace:*"
+    "emmet-monaco-es": "^5.7.0",
+    "monaco-editor": "^0.55.1",
+    "monaco-themes": "^0.4.8",
+    "monaco-vim": "^0.4.4"
   },
   "devDependencies": {
-    "vite": "^7.1.5"
+    "jsdom": "^26.1.0",
+    "vite": "^7.1.5",
+    "vitest": "^2.1.5"
   }
 }

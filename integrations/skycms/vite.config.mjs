@@ -3,6 +3,9 @@ import path from 'path';
 
 export default defineConfig({
   root: 'playground',
+  optimizeDeps: {
+    exclude: ['monaco-editor'],
+  },
   build: {
     outDir: '../playground-dist',
     emptyOutDir: true,
