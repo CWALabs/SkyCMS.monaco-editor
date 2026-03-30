@@ -7,6 +7,10 @@
 	"homepage": "https://github.com/microsoft/monaco-editor",
 	"author": "Microsoft Corporation",
 	"license": "MIT",
+	"engines": {
+		"node": ">=24.11.0",
+		"pnpm": ">=10.28.0"
+	},
 	"scripts": {
 		"import-typescript": "ts-node ./build/importTypescript",
 		"postinstall": "ts-node ./build/postinstall",
