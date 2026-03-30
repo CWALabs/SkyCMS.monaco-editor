@@ -98,7 +98,10 @@ These are currently playground-level validation features only. They are not yet 
 
 ```bash
 # Deploy the built library to Sky.Editor
+pnpm build:all
+pnpm deploy:skycms
 ```
+
 
 ## Upstream Synchronization
 
