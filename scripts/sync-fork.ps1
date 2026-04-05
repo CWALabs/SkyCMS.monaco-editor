@@ -126,6 +126,16 @@ function Remove-UpstreamWorkflowFiles {
 	}
 }
 
+function Commit-VendorBranchSanitization {
+	$status = Get-GitOutput -Args @('status', '--porcelain')
+	if (-not $status) {
+		return
+	}
+
+	Write-Host 'Committing vendor branch sanitization changes...' -ForegroundColor Yellow
+	Invoke-Git -Args @('commit', '-m', 'chore: remove upstream workflow files from vendor branch') -MutatesRepository -Operation 'commit vendor branch sanitization changes'
+}
+
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..')
 Push-Location $repoRoot
 
@@ -167,6 +177,7 @@ try {
 
 	if ($ExcludeWorkflowFiles) {
 		Remove-UpstreamWorkflowFiles
+		Commit-VendorBranchSanitization
 	}
 
 	if ($Push) {
