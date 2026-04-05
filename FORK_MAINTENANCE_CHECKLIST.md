@@ -7,11 +7,10 @@ Use this checklist when maintaining the SkyCMS Monaco fork.
 - Set `skycms/main` as the default branch.
 - Protect `skycms/main` with the required review and CI rules your team expects.
 - Leave `vendor/monaco-editor` unprotected unless GitHub Actions has an allowed bypass path for automated mirror updates.
-- Add a repository secret named `MONACO_SYNC_TOKEN` backed by a fine-grained PAT or GitHub App token with `Contents: Read and write` and `Workflows: Read and write` so the sync workflow can create or update branches that contain workflow files.
 
 ## Branch Roles
 
-- `vendor/monaco-editor` mirrors `microsoft/monaco-editor`.
+- `vendor/monaco-editor` tracks `microsoft/monaco-editor` but intentionally removes upstream workflow files before push.
 - `skycms/main` carries SkyCMS-specific integration work and deployment behavior.
 - Promotion from vendor to SkyCMS should happen by pull request, not by direct merge from automation.
 
@@ -20,7 +19,7 @@ Use this checklist when maintaining the SkyCMS Monaco fork.
 - Run `Sync Upstream Main Into Vendor Branch` on a schedule or on demand.
 - Run `Open Vendor PR Into SkyCMS Main` after the vendor branch is refreshed.
 - Review the promotion PR for integration breakage, asset changes, and deployment impact before merging.
-- If the sync workflow fails with a workflow-permission error while pushing `vendor/monaco-editor`, configure `MONACO_SYNC_TOKEN` before rerunning it.
+- The vendor sync intentionally strips `.github/workflows/` from the upstream snapshot so it can push with the standard GitHub Actions token.
 
 ## Local Validation
 

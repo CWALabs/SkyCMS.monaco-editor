@@ -6,7 +6,7 @@ Its purpose is to keep the Monaco upstream codebase available in a controlled ve
 
 ## Branch Model
 
-- `vendor/monaco-editor`: upstream mirror branch refreshed from `microsoft/monaco-editor`
+- `vendor/monaco-editor`: upstream-tracking branch refreshed from `microsoft/monaco-editor`, with upstream workflow files excluded
 - `skycms/main`: SkyCMS product branch and the expected default branch for this fork
 
 Upstream updates should land in `vendor/monaco-editor` first and then move into `skycms/main` through a reviewed pull request.

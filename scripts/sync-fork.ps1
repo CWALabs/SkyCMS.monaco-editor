@@ -5,6 +5,7 @@ param(
 	[string]$UpstreamUrl = 'https://github.com/microsoft/monaco-editor.git',
 	[string]$UpstreamBranch = 'main',
 	[string]$VendorBranch = 'vendor/monaco-editor',
+	[switch]$ExcludeWorkflowFiles,
 	[switch]$Push,
 	[switch]$SkipCleanCheck
 )
@@ -12,12 +13,13 @@ param(
 # Mirrors the upstream Monaco Editor branch into a non-default vendor branch used by SkyCMS.
 #
 # Branch roles:
-# - vendor/monaco-editor: upstream-tracking mirror branch.
+# - vendor/monaco-editor: upstream-tracking branch with upstream workflow files removed.
 # - skycms/main: SkyCMS customization and deployment branch.
 #
 # Promotion into skycms/main is intentionally handled via pull request review.
 
 $ErrorActionPreference = 'Stop'
+$isWhatIf = [bool]$WhatIfPreference
 
 function Invoke-Git {
 	param(
@@ -104,6 +106,26 @@ function Resolve-OriginRemote {
 	throw "Could not resolve a fork remote. Pass -OriginRemote explicitly."
 }
 
+function Remove-UpstreamWorkflowFiles {
+	$workflowDirectory = Join-Path $repoRoot '.github/workflows'
+
+	if (-not (Test-Path $workflowDirectory)) {
+		return
+	}
+
+	Write-Host 'Removing upstream workflow files from the vendor branch...' -ForegroundColor Yellow
+	Invoke-Git -Args @('rm', '-r', '--ignore-unmatch', '.github/workflows') -MutatesRepository -Operation 'remove upstream workflow files from vendor branch'
+
+	if (-not (Test-Path (Join-Path $repoRoot '.github'))) {
+		return
+	}
+
+	$remainingFiles = Get-ChildItem -Path (Join-Path $repoRoot '.github') -Recurse -File -ErrorAction SilentlyContinue
+	if (-not $remainingFiles) {
+		Invoke-Git -Args @('rm', '-r', '--ignore-unmatch', '.github') -MutatesRepository -Operation 'remove empty .github directory from vendor branch'
+	}
+}
+
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..')
 Push-Location $repoRoot
 
@@ -126,6 +148,11 @@ try {
 	else {
 		Write-Host "Adding remote '$UpstreamRemote'..." -ForegroundColor Yellow
 		Invoke-Git -Args @('remote', 'add', $UpstreamRemote, $UpstreamUrl) -MutatesRepository -Operation 'configure upstream remote'
+
+		if ($isWhatIf) {
+			Write-Host 'WhatIf mode: stopping before fetch because the upstream remote was not actually created.' -ForegroundColor Yellow
+			return
+		}
 	}
 
 	Write-Host "Fetching $upstreamRef..." -ForegroundColor Yellow
@@ -137,6 +164,10 @@ try {
 
 	Write-Host "Refreshing vendor branch $VendorBranch from $upstreamRef..." -ForegroundColor Yellow
 	Invoke-Git -Args @('checkout', '-B', $VendorBranch, $upstreamRef) -MutatesRepository -Operation 'reset vendor branch to upstream'
+
+	if ($ExcludeWorkflowFiles) {
+		Remove-UpstreamWorkflowFiles
+	}
 
 	if ($Push) {
 		Write-Host "Pushing mirrored vendor branch to $originRemote/$VendorBranch..." -ForegroundColor Yellow

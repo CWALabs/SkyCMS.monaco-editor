@@ -28,21 +28,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.MONACO_SYNC_TOKEN != '' && secrets.MONACO_SYNC_TOKEN || github.token }}
 
       - name: Configure git identity
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Require workflow-capable token when creating workflow-bearing branches
-        if: ${{ secrets.MONACO_SYNC_TOKEN == '' }}
-        run: |
-          echo "MONACO_SYNC_TOKEN is not configured." >&2
-          echo "Create a fine-grained PAT or GitHub App token with Contents: Read and write and Workflows: Read and write for this repository, then store it as the MONACO_SYNC_TOKEN repository secret." >&2
-          exit 1
-
       - name: Mirror upstream into vendor branch
         shell: pwsh
         run: |
-          ./scripts/sync-fork.ps1 -OriginRemote origin -UpstreamRemote upstream -UpstreamBranch "$env:UPSTREAM_BRANCH" -VendorBranch "$env:VENDOR_BRANCH" -Push
+          ./scripts/sync-fork.ps1 -OriginRemote origin -UpstreamRemote upstream -UpstreamBranch "$env:UPSTREAM_BRANCH" -VendorBranch "$env:VENDOR_BRANCH" -ExcludeWorkflowFiles -Push
