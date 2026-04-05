@@ -1,0 +1,89 @@
+name: Open Vendor PR Into SkyCMS Main
+
+on:
+  workflow_dispatch:
+    inputs:
+      vendor_branch:
+        description: Vendor mirror branch to promote into skycms/main
+        required: false
+        default: vendor/monaco-editor
+      base_branch:
+        description: SkyCMS branch that receives reviewed upstream updates
+        required: false
+        default: skycms/main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open-pr:
+    runs-on: ubuntu-latest
+    env:
+      VENDOR_BRANCH: ${{ github.event.inputs.vendor_branch || 'vendor/monaco-editor' }}
+      BASE_BRANCH: ${{ github.event.inputs.base_branch || 'skycms/main' }}
+    steps:
+      - name: Create or reuse pull request
+        id: create_pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const head = process.env.VENDOR_BRANCH;
+            const base = process.env.BASE_BRANCH;
+
+            await github.rest.repos.getBranch({ owner, repo, branch: head });
+            await github.rest.repos.getBranch({ owner, repo, branch: base });
+
+            const comparison = await github.rest.repos.compareCommitsWithBasehead({
+              owner,
+              repo,
+              basehead: `${base}...${head}`
+            });
+
+            if (comparison.data.ahead_by === 0) {
+              core.setOutput('pr_url', '');
+              core.setOutput('message', `No pull request created because ${head} is not ahead of ${base}.`);
+              return;
+            }
+
+            const existing = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'open',
+              head: `${owner}:${head}`,
+              base
+            });
+
+            if (existing.data.length > 0) {
+              core.setOutput('pr_url', existing.data[0].html_url);
+              core.setOutput('message', `Reusing existing pull request ${existing.data[0].html_url}`);
+              return;
+            }
+
+            const pr = await github.rest.pulls.create({
+              owner,
+              repo,
+              head,
+              base,
+              title: `Merge ${head} into ${base}`,
+              body: [
+                'Promotes the latest mirrored Monaco upstream baseline into the SkyCMS customization branch.',
+                '',
+                `- Source branch: ${head}`,
+                `- Target branch: ${base}`,
+                '',
+                'Review SkyCMS-specific integrations, generated assets, and deployment impact before merging.'
+              ].join('\n')
+            });
+
+            core.setOutput('pr_url', pr.data.html_url);
+            core.setOutput('message', `Created pull request ${pr.data.html_url}`);
+
+      - name: Print result
+        run: |
+          echo "${{ steps.create_pr.outputs.message }}"
+          if [ -n "${{ steps.create_pr.outputs.pr_url }}" ]; then
+            echo "Pull request: ${{ steps.create_pr.outputs.pr_url }}"
+          fi

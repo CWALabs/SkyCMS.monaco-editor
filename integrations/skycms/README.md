@@ -102,25 +102,31 @@ pnpm build:all
 pnpm deploy:skycms
 ```
 
-
 ## Upstream Synchronization
 
-Manage updates from the official monaco-editor repository:
+Manage updates from the official monaco-editor repository using the SkyCMS vendor-branch flow:
 
 ```bash
 # Check sync status
 pnpm sync:status
 
-# Sync upstream changes
+# Refresh vendor/monaco-editor from upstream/main
 pnpm sync:upstream
 
-# Full sync workflow (prepare, merge, etc.)
+# Create or refresh a local review branch from vendor/monaco-editor
+pnpm sync:prepare
+
+# Full local workflow (refresh vendor branch, then refresh review branch)
 pnpm sync:full
 ```
 
+Normal promotion into `skycms/main` should happen through a pull request from `vendor/monaco-editor` into `skycms/main`.
+
+`pnpm sync:merge` remains available as a local-only escape hatch when a manual merge is explicitly required.
+
 ## Structure
 
-```
+```text
 integrations/skycms/
 ├── src/                  # Integration source code
 ├── playground/           # Development playground
@@ -170,35 +176,35 @@ This is the initial API shape for `@skycms/monaco-editor-integration`.
 
 ```ts
 export type SkyCmsEditorField = {
-	id: string;           // e.g. "HeadJavaScript"
-	name: string;         // e.g. "Head Block"
-	language: string;     // e.g. "html"
-	value: string;
-	uri?: string;         // optional explicit URI
-	readOnly?: boolean;
+  id: string;           // e.g. "HeadJavaScript"
+  name: string;         // e.g. "Head Block"
+  language: string;     // e.g. "html"
+  value: string;
+  uri?: string;         // optional explicit URI
+  readOnly?: boolean;
 };
 
 export type SkyCmsEditorOptions = {
-	container: HTMLElement;
-	fields: SkyCmsEditorField[];
-	activeFieldId: string;
-	theme?: string;
-	readOnly?: boolean;
-	automaticLayout?: boolean;
+  container: HTMLElement;
+  fields: SkyCmsEditorField[];
+  activeFieldId: string;
+  theme?: string;
+  readOnly?: boolean;
+  automaticLayout?: boolean;
 };
 
 export type SkyCmsEditorInstance = {
-	switchField(fieldId: string): void;
-	getActiveFieldId(): string;
-	getValue(fieldId?: string): string;
-	setValue(fieldId: string, value: string): void;
-	getAllValues(): Record<string, string>;
-	markClean(fieldId?: string): void;
-	isDirty(fieldId?: string): boolean;
-	onDidChangeActiveField(listener: (fieldId: string) => void): () => void;
-	onDidChangeDirty(listener: (fieldId: string, dirty: boolean) => void): () => void;
-	focus(): void;
-	dispose(): void;
+  switchField(fieldId: string): void;
+  getActiveFieldId(): string;
+  getValue(fieldId?: string): string;
+  setValue(fieldId: string, value: string): void;
+  getAllValues(): Record<string, string>;
+  markClean(fieldId?: string): void;
+  isDirty(fieldId?: string): boolean;
+  onDidChangeActiveField(listener: (fieldId: string) => void): () => void;
+  onDidChangeDirty(listener: (fieldId: string, dirty: boolean) => void): () => void;
+  focus(): void;
+  dispose(): void;
 };
 
 export function createSkyCmsEditor(options: SkyCmsEditorOptions): SkyCmsEditorInstance;

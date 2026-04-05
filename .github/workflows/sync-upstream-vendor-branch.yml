@@ -1,0 +1,40 @@
+name: Sync Upstream Main Into Vendor Branch
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      upstream_branch:
+        description: Upstream branch to mirror into the vendor branch
+        required: false
+        default: main
+      vendor_branch:
+        description: Vendor mirror branch maintained in this repository
+        required: false
+        default: vendor/monaco-editor
+
+permissions:
+  contents: write
+
+jobs:
+  sync-vendor-branch:
+    runs-on: ubuntu-latest
+    env:
+      UPSTREAM_BRANCH: ${{ github.event.inputs.upstream_branch || 'main' }}
+      VENDOR_BRANCH: ${{ github.event.inputs.vendor_branch || 'vendor/monaco-editor' }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Mirror upstream into vendor branch
+        shell: pwsh
+        run: |
+          ./scripts/sync-fork.ps1 -OriginRemote origin -UpstreamRemote upstream -UpstreamBranch "$env:UPSTREAM_BRANCH" -VendorBranch "$env:VENDOR_BRANCH" -Push

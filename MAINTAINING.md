@@ -1,16 +1,24 @@
 # Maintaining
 
-(For maintainers only)
+This repository is maintained as a SkyCMS integration fork.
+
+For normal maintenance in this fork, use `FORK_MAINTENANCE_CHECKLIST.md`, the vendor-sync workflow, and the promotion PR workflow.
+
+The remainder of this file is retained as upstream reference material for cases where the SkyCMS fork needs to understand or compare Monaco's original release process.
+
+## Upstream Triage Reference
 
 Make sure every unassigned issue is labeled properly:
 
 - [Inbox Queue](https://github.com/microsoft/monaco-editor/issues?q=is%3Aissue+is%3Aopen+no%3Aassignee+-label%3Afeature-request+-label%3Aupstream+-label%3A%22info-needed%22++-label%3Abug+)
 
-## Publishing a stable build monaco-editor build
+## Upstream Publishing Reference
+
+### Publishing a stable build monaco-editor build
 
 - Trigger an rc-build
-  - Go to https://github.com/microsoft/vscode/tree/release/1.89 (use latest VS Code version instead of .89!) and copy the id of the latest commit
-  - Go to https://dev.azure.com/monacotools/Monaco/_build?definitionId=421 and click on "Run pipeline"
+  - Go to [microsoft/vscode release/1.89](https://github.com/microsoft/vscode/tree/release/1.89) (use the latest VS Code version instead of `.89`) and copy the id of the latest commit
+  - Go to [the Monaco rc build pipeline](https://dev.azure.com/monacotools/Monaco/_build?definitionId=421) and click on "Run pipeline"
     - Use the copied commit id for `The VS Code commit id.`
     - Use `rc` for `The prerelease version.`
   - Wait until pipeline completes
@@ -29,10 +37,10 @@ Make sure every unassigned issue is labeled properly:
   - Publish Monaco Editor Core
   - Publish Monaco Editor
 
-#### Publish new webpack plugin
+### Publish new webpack plugin
 
 - **TBD**
-- https://github.com/microsoft/monaco-editor/tree/main/webpack-plugin
+- [microsoft/monaco-editor webpack-plugin](https://github.com/microsoft/monaco-editor/tree/main/webpack-plugin)
 - `npm install .`
 - `npm run import-editor`
 - if there are no changes generated after the script:
