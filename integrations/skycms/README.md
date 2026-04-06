@@ -2,6 +2,11 @@
 
 This folder contains the SkyCMS integration layer for Monaco Editor. It provides:
 
+- **SkyCMS editor core**: Multi-field editor wiring, SkyCMS field adapters, active-field resolution, dirty tracking, and AMD loader configuration helpers
+- **GitHub Copilot integration**: Inline completion provider plus proxy status helpers for SkyCMS-hosted Copilot-backed suggestions
+- **Emmet integration**: Abbreviation support for HTML/CSS language families used in SkyCMS authoring flows
+- **Playground runtime helpers**: Local SkyCMS host simulation and optional playground add-ons used to validate integration behavior before deployment
+
 - **Playground**: Development environment for testing the editor
 - **Integration layer**: Custom wrapping and utilities for SkyCMS
 - **Build tooling**: Vite-based build pipeline for development and production

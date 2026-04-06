@@ -15,6 +15,12 @@ Upstream updates should land in `vendor/monaco-editor` first and then move into 
 
 The active SkyCMS integration lives in `integrations/skycms/`.
 
+- SkyCMS editor core for multi-field editing, field-to-model mapping, active-field resolution, dirty tracking, and Monaco AMD runtime setup
+- GitHub Copilot inline-completion integration via the SkyCMS proxy helpers in `integrations/skycms/src/copilot.ts`
+- Emmet support for HTML, Razor, Handlebars, CSS, SCSS, and LESS authoring flows
+- Local playground and runtime helpers for validating SkyCMS host behavior before deployment
+- Deploy and packaging scripts for shipping the SkyCMS Monaco bundle and curated Monaco assets back into SkyCMS
+
 - Integration package and playground: `integrations/skycms/`
 - Local sync helper: `integrations/skycms/scripts/upstream-sync-workflow.mjs`
 - Local audit wrapper: `integrations/skycms/scripts/upstream-sync-workflow.ps1`
