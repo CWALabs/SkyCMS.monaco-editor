@@ -12,8 +12,8 @@
     "build:assets": "node scripts/package-monaco-assets.mjs",
     "preview": "vite preview --config vite.config.mjs",
     "build:monaco": "cd ../../ && npm run build",
-    "build:all": "pnpm build:lib && pnpm build:assets && pnpm build",
-    "build:all:with-upstream": "pnpm build:monaco && pnpm build:all",
+    "build:all": "vite build --config vite.lib.config.mjs && node scripts/package-monaco-assets.mjs && vite build --config vite.config.mjs",
+    "build:all:with-upstream": "cd ../../ && npm run build && vite build --config vite.lib.config.mjs && node scripts/package-monaco-assets.mjs && vite build --config vite.config.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "deploy:skycms": "node scripts/deploy-skycms.mjs",
@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "emmet-monaco-es": "^5.7.0",
-    "monaco-editor": "^0.55.1",
+    "monaco-editor": "0.55.1",
     "monaco-themes": "^0.4.8",
     "monaco-vim": "^0.4.4"
   },

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { cpSync, existsSync, mkdirSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -16,6 +16,7 @@ if (!existsSync(sourceVs)) {
   process.exit(1);
 }
 
+rmSync(targetVs, { recursive: true, force: true });
 mkdirSync(targetVs, { recursive: true });
 cpSync(sourceVs, targetVs, { recursive: true });
 
